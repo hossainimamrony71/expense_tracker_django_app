@@ -1,0 +1,184 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>{% block title %}Dashboard{% endblock %}</title>
+    
+
+
+    <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'assets/css/animate.css' %}" />
+    <link rel="stylesheet" href="{% static 'assets/plugins/select2/css/select2.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'assets/css/dataTables.bootstrap4.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'assets/plugins/fontawesome/css/fontawesome.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'assets/plugins/fontawesome/css/all.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}" />
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'assets/img/favicon.jpg' %}" />
+    
+    
+    <style>
+        {% block extra_css %}{% endblock %}
+    </style>
+</head>
+<body>
+    <div class="main-wrapper">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left active">
+                <a href="{% url 'dashboard' %}" class="logo">
+                    <img src="{% static 'assets/img/logo_2.png' %}" alt="Logo">
+                </a>
+                <a href="{% url 'dashboard' %}" class="logo-small">
+                    <img src="{% static 'assets/img/logo-small.png' %}" alt="Logo Small">
+                </a>
+                <a id="toggle_btn" href="javascript:void(0);"></a>
+            </div>
+            <a id="mobile_btn" class="mobile_btn" href="#sidebar">
+                <span class="bar-icon">
+                    <span></span><span></span><span></span>
+                </span>
+            </a>
+            <ul class="nav user-menu">
+                <li class="nav-item dropdown has-arrow main-drop">
+                    <a href="javascript:void(0);" class="dropdown-toggle nav-link userset" data-bs-toggle="dropdown">
+                        <span class="user-img">
+                            {% if request.user.user_type == 'ted' %}
+                                <img src="{% static 'assets/img/ted.png' %}" alt="Profile">
+                            {% elif request.user.user_type == 's2l' %}
+                                <img src="{% static 'assets/img/s2l.png' %}" alt="Profile">
+                            {% elif request.user.user_type == 'admin' %}
+                                <img src="{% static 'assets/img/profiles/admin.png' %}" alt="Profile">
+                            {% else %}
+                                <img src="{% static 'assets/img/profiles/avator1.jpg' %}" alt="Profile">
+                            {% endif %}
+                            <span class="status online"></span>
+                        </span>
+                    </a>
+                    <div class="dropdown-menu menu-drop-user">
+                        <div class="profilename">
+                            <div class="profileset">
+                                <span class="user-img">
+                                    {% if request.user.user_type == 'ted' %}
+                                        <img src="{% static 'assets/img/ted.png' %}" alt="Profile">
+                                    {% elif request.user.user_type == 's2l' %}
+                                        <img src="{% static 'assets/img/s2l.png' %}" alt="Profile">
+                                    {% elif request.user.user_type == 'admin' %}
+                                        <img src="{% static 'assets/img/profiles/admin.png' %}" alt="Profile">
+                                    {% else %}
+                                        <img src="{% static 'assets/img/profiles/avator1.jpg' %}" alt="Profile">
+                                    {% endif %}
+                                    <span class="status online"></span>
+                                </span>
+                                <div class="profilesets">
+                                    <h6>{{ request.user.username}}</h6>
+                                    <h5>{{ request.user.user_type|title }}</h5>
+                                </div>
+                            </div>
+                            <hr class="m-0">
+                            <a class="dropdown-item" href="#">
+                                <i class="me-2" data-feather="user"></i> My Profile
+                            </a>
+                            <hr class="m-0">
+                            <a class="dropdown-item logout pb-0" href="{% url 'logout' %}">
+                                <img src="{% static 'assets/img/icons/log-out.svg' %}" class="me-2" alt="Logout"> Logout
+                            </a>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            
+        </div>
+        <!-- /Header -->
+
+        <!-- Sidebar -->
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-inner slimscroll">
+        <div id="sidebar-menu" class="sidebar-menu">
+            <ul>
+                <!-- Dashboard -->
+                <li class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <a href="{% url 'dashboard' %}">
+                        <img src="{% static 'assets/img/icons/dashboard.svg' %}" alt="Dashboard Icon">
+                        <span> Dashboard</span>
+                    </a>
+                </li>
+            
+
+              <li class="{% if request.resolver_match.url_name == 'expense-list' %}active{% endif %}">
+                  <a href="{% url 'expense-list' %}">
+                      <img src="{% static 'assets/img/expense_list_logo.png' %}" alt="Expense List Icon">
+                      <span> Expense List</span>
+                  </a>
+              </li>
+              <li class="{% if request.resolver_match.url_name == 'expense-create' %}active{% endif %}">
+                  <a href="{% url 'expense-create' %}">
+                      <img src="{% static 'assets/img/add_expense_logo.png' %}" alt="Add Expense Icon">
+                      <span> Add Expense </span>
+                  </a>
+              </li>
+              <li class="{% if request.resolver_match.url_name == 'category-list' %}active{% endif %}">
+                  <a href="{% url 'category-list' %}">
+                      <img src="{% static 'assets/img/category_logo.png' %}" alt="Cagegory List Icon">
+                      <span> Category List </span>
+                  </a>
+              </li>
+              <li class="{% if request.resolver_match.url_name == 'category-add' %}active{% endif %}">
+                  <a href="{% url 'category-add' %}">
+                      <img src="{% static 'assets/img/add_category_logo.png' %}" alt="Add Category Icon">
+                      <span> Add Category </span>
+                  </a>
+              </li>
+             
+  
+              
+
+            
+
+
+                <!-- Loan Manager -->
+                <li class="{% if request.resolver_match.url_name == 'loan_ted_s2l' %}active{% endif %}">
+                    <a href="{% url 'loan_ted_s2l' %}">
+                        <img src="{% static 'assets/img/loan_logo.webp' %}" alt="Loan Icon">
+                        <span> Loan Services </span>
+                    </a>
+                </li>
+
+
+            </ul>
+        </div>
+    </div>
+</div>
+<!-- /Sidebar -->
+        <!-- /Sidebar -->
+
+        <!-- Page Content -->
+        <div class="page-wrapper">
+            <div class="content">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+        <!-- /Page Content -->
+    </div>
+
+    <!-- Scripts -->
+    <script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"></script>
+    <script src="{% static 'assets/js/feather.min.js' %}"></script>
+    <script src="{% static 'assets/js/jquery.slimscroll.min.js' %}"></script>
+    <script src="{% static 'assets/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'assets/js/dataTables.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/plugins/select2/js/select2.min.js' %}"></script>
+    <script src="{% static 'assets/plugins/sweetalert/sweetalert2.all.min.js' %}"></script>
+    <script src="{% static 'assets/plugins/sweetalert/sweetalerts.min.js' %}"></script>
+    <script src="{% static 'assets/plugins/apexchart/apexcharts.min.js' %}"></script>
+    <script src="{% static 'assets/plugins/apexchart/chart-data.js' %}"></script>
+    <script src="{% static 'assets/js/script.js' %}"></script>
+    
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

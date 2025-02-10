@@ -1,0 +1,143 @@
+{% extends base_template %}
+{% load static %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+
+
+
+
+<div class="page-header">
+  <div class="page-title">
+    <h4>Expense Category list</h4>
+    <h6>View/Search expense Category</h6>
+  </div>
+  {% if  show_button %}
+  <div class="page-btn">
+    <a href="{% url 'category-add' %}" class="btn btn-added">
+      <img src="{% static 'assets/img/icons/plus.svg' %}" class="me-1" alt="img">Add Category
+    </a>
+  </div>
+{% endif %}
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <!-- ... your filter and search markup ... -->
+
+    <div class="table-responsive">
+      <table class="table datanew">
+        <thead>
+          <tr>
+            <th>
+              <label class="checkboxs">
+                <input type="checkbox" id="select-all">
+                <span class="checkmarks"></span>
+              </label>
+            </th>
+            <th>Category name</th>
+            <th>Description</th>
+            <th>Created By</th>
+            {% if  show_button %}
+            <th>Action</th>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for category in categories %}
+          <tr id="row-{{ category.id }}">
+            <td>
+              <label class="checkboxs">
+                <input type="checkbox">
+                <span class="checkmarks"></span>
+              </label>
+            </td>
+            <td class="productimgname">
+              <a href="javascript:void(0);">{{ category.name }}</a>
+            </td>
+            <td>{{ category.description|default:"" }}</td>
+            <td>{{ category.created_by.username }}</td>
+            {% if  show_button %}
+            <td>
+              <a class="me-3" href="{% url 'category-edit' category.id %}">
+                <img src="{% static 'assets/img/icons/edit.svg' %}" alt="img">
+              </a>
+              <!-- The delete button with the data-id attribute -->
+              <a class="me-3 delete-category" data-id="{{ category.id }}" href="javascript:void(0);">
+                <img src="{% static 'assets/img/icons/delete.svg' %}" alt="img">
+              </a>
+              
+            </td>
+            {% endif %}
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6">No categories found.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Include jQuery before this script if not already included -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  $(document).ready(function(){
+    $('.delete-category').on('click', function(e) {
+      // Prevent other click handlers from executing
+      e.stopImmediatePropagation();
+      e.preventDefault();
+
+      var $btn = $(this);
+      var categoryId = $btn.data('id');
+
+      Swal.fire({
+        title: "Are you sure?",
+        text: "This action cannot be undone!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          $.ajax({
+            url: "{% url 'category-delete' 0 %}".replace("0", categoryId),
+            type: "POST",
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+              if(response.success) {
+                Swal.fire({
+                  title: "Deleted!",
+                  text: "The category has been deleted.",
+                  icon: "success",
+                  timer: 1500,  // Auto-close alert after 1.5 seconds
+                  showConfirmButton: false
+                }).then(() => {
+                  $("#row-" + categoryId).fadeOut("slow", function(){
+                    $(this).remove();
+                  });
+                });
+              } else {
+                Swal.fire("Error!", response.error, "error");
+              }
+            },
+            error: function() {
+              Swal.fire("Error!", "An error occurred while deleting the category.", "error");
+            }
+          });
+        }
+      });
+    });
+  });
+</script>
+
+
+
+  {% endblock %}

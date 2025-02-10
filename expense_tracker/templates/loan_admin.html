@@ -1,0 +1,156 @@
+
+
+{# loan_admin.html #}
+{% extends base_template %}
+{% load static %}
+{% load tz %}
+ {# load our custom filter; see next section #}
+
+{% block title %}Dashboard{% endblock %}
+{% block extra_css %}
+/* === Approve Button === */
+.uniq-apprv-abc123 {
+  background: linear-gradient(135deg, #4CAF50, #3e8e41); /* Soft green gradient */
+  border: none;
+  color: white;
+  padding: 10px 18px;
+  font-size: 15px;
+  font-weight: bold;
+  border-radius: 6px;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+.uniq-apprv-abc123:hover {
+  background: linear-gradient(135deg, #45a049, #3a7d3a);
+  box-shadow: 0 5px 12px rgba(0, 128, 0, 0.3); /* Green glow effect */
+  transform: translateY(-2px);
+}
+
+/* === Decline Button === */
+.uniq-decln-def456 {
+  background: linear-gradient(135deg, #f44336, #d32f2f); /* Soft red gradient */
+  border: none;
+  color: white;
+  padding: 10px 18px;
+  font-size: 15px;
+  font-weight: bold;
+  border-radius: 6px;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+.uniq-decln-def456:hover {
+  background: linear-gradient(135deg, #da190b, #b71c1c);
+  box-shadow: 0 5px 12px rgba(255, 0, 0, 0.3); /* Red glow effect */
+  transform: translateY(-2px);
+}
+
+{% comment %} status of the loan {% endcomment %}
+.status-pending {
+  background-color: #fdf6b2; /* Soft Yellow */
+  color: #856404; /* Dark Gold */
+  padding: 6px 15px;
+  border-radius: 10px;
+  font-weight: bold;
+  border: 1px solid #ffeeba;
+}
+
+.status-approved {
+  background-color: #d4edda; /* Soft Green */
+  color: #155724; /* Dark Green */
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-weight: bold;
+  border: 1px solid #c3e6cb;
+}
+
+.status-declined {
+  background-color: #f8d7da; /* Soft Red */
+  color: #721c24; /* Dark Red */
+  padding: 6px 15px;
+  border-radius: 10px;
+  font-weight: bold;
+  border: 1px solid #f5c6cb;
+}
+
+
+{% endblock %}
+
+
+{% block content %}
+<div class="page-header">
+  <div class="page-title">
+      <h4>Loan Requests Dashboard</h4>
+      <h6>All loan requests and summary statistics</h6>
+  </div>
+</div>
+
+
+
+<!-- Loan Requests Table -->
+<div class="card">
+  <div class="card-body">
+      <div class="table-responsive">
+          <table class="table datanew">
+              <thead>
+                  <tr>
+                      <th>#</th>
+                      <th>From Department</th>
+                      <th>To Department</th>
+                      <th>Amount</th>
+                      <th>Status</th>
+                      <th>Requested At</th>
+                      <th>Actions</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for loan in loans %}
+                  <tr>
+                      <td>{{ forloop.counter }}</td>
+                      <td>{{ loan.get_from_department_display }}</td>
+                      <td>{{ loan.get_to_department_display }}</td>
+                      <td>{{ loan.amount }}</td>
+                      <td>
+                        <span class="
+                          {% if loan.status == 'pending' %} status-pending 
+                          {% elif loan.status == 'approved' %} status-approved 
+                          {% elif loan.status == 'declined' %} status-declined 
+                          {% else %} status-default 
+                          {% endif %}">
+                          {{ loan.get_status_display }}
+                        </span>
+                      </td>
+                      
+                      <td>
+                        {% localtime on %}
+                          {{ loan.requested_at|date:"Y-m-d h:i A" }}
+                        {% endlocaltime %}
+                      </td>
+                      <td>
+                        {% if loan.status == 'pending' %}
+                          <a href="{% url 'approve_loan' loan.id %}" class="btn btn-success btn-sm uniq-apprv-abc123">Approve</a>
+                          <a href="{% url 'decline_loan' loan.id %}" class="btn btn-danger btn-sm uniq-decln-def456">Decline</a>
+                        {% else %}
+                          <span class="badge badge-secondary">{{ loan.get_status_display }}</span>
+                        {% endif %}
+                      </td>
+                      
+                  </tr>
+                  {% empty %}
+                  <tr>
+                      <td colspan="7" class="text-center">No loan requests found.</td>
+                  </tr>
+                  {% endfor %}
+              </tbody>
+          </table>
+      </div>
+  </div>
+</div>
+
+
+{% endblock %}

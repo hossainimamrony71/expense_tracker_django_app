@@ -1,0 +1,135 @@
+{% extends base_template %}
+{% load static %}
+{% block title %}Dashboard{% endblock %}
+{% load tz %}
+{% block extra_css %}
+{% comment %} status of the loan {% endcomment %}
+.status-pending {
+    background-color: #fdf6b2; /* Soft Yellow */
+    color: #856404; /* Dark Gold */
+    padding: 6px 15px;
+    border-radius: 10px;
+    font-weight: bold;
+    border: 1px solid #ffeeba;
+  }
+  
+  .status-approved {
+    background-color: #d4edda; /* Soft Green */
+    color: #155724; /* Dark Green */
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-weight: bold;
+    border: 1px solid #c3e6cb;
+  }
+  
+  .status-declined {
+    background-color: #f8d7da; /* Soft Red */
+    color: #721c24; /* Dark Red */
+    padding: 6px 15px;
+    border-radius: 10px;
+    font-weight: bold;
+    border: 1px solid #f5c6cb;
+{% endblock %}
+
+
+
+
+{% block content %}
+
+<div class="page-header">
+  <div class="page-title">
+      <h4>Loan Request</h4>
+      <h6>Request money from the other department</h6>
+  </div>
+</div>
+
+<!-- Loan Request Form -->
+<div class="card mb-3">
+  <div class="card-body">
+      <form method="post" action="{% url 'loan_ted_s2l' %}">
+          {% csrf_token %}
+          <div class="row">
+              <!-- Recipient Department Dropdown -->
+              <div class="col-lg-6 col-md-6">
+                  <label for="{{ form.to_department.id_for_label }}">Recipient Department</label>
+                  {{ form.to_department }}
+              </div>
+
+              <!-- Amount Input -->
+              <div class="col-lg-6 col-md-6">
+                  <label for="{{ form.amount.id_for_label }}">Amount</label>
+                  {{ form.amount }}
+              </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="row mt-2">
+              <div class="col-lg-12">
+                  <button type="submit" class="btn btn-primary">Submit Loan Request</button>
+              </div>
+          </div>
+
+          <!-- Display form errors, if any -->
+          {% if form.errors %}
+          <div class="alert alert-danger mt-2">
+              {{ form.errors }}
+          </div>
+          {% endif %}
+      </form>
+  </div>
+</div>
+
+<!-- Loan Requests List Table -->
+<div class="card">
+  <div class="card-body">
+      <div class="table-responsive">
+          <table class="table datanew">
+              <thead>
+                  <tr>
+                      <th>#</th>
+                      <th>From Department</th>
+                      <th>To Department</th>
+                      <th>Amount</th>
+                      <th>Status</th>
+                      <th>Requested At</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for loan in allocations %}
+                  <tr>
+                      <td>{{ forloop.counter }}</td>
+                      <td>{{ loan.get_from_department_display }}</td>
+                      <td>{{ loan.get_to_department_display }}</td>
+                      <td>{{ loan.amount }}</td>
+                      <td>
+                        <span class="
+                          {% if loan.status == 'pending' %} status-pending 
+                          {% elif loan.status == 'approved' %} status-approved 
+                          {% elif loan.status == 'declined' %} status-declined 
+                          {% else %} status-default 
+                          {% endif %}">
+                          {{ loan.get_status_display }}
+                        </span>
+                      </td>
+                      <td>
+                        {% localtime on %}
+                          {{ loan.requested_at|date:"Y-m-d h:i A" }}
+                        {% endlocaltime %}
+                      </td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                      <td colspan="6" class="text-center">No loan requests found.</td>
+                  </tr>
+                  {% endfor %}
+              </tbody>
+          </table>
+      </div>
+  </div>
+</div>
+
+
+
+
+
+{% endblock %}

@@ -1,0 +1,241 @@
+{% extends base_template %}
+{% load static %}
+{% block title %}Dashboard{% endblock %}
+{% load tz %}
+{% block content %}
+
+<div class="page-header">
+    <div class="page-title">
+        <h4>Expense List</h4>
+        <h6>Manage Your Expenses</h6>
+    </div>
+    {% if show_button %}
+    <div class="page-btn">
+        <a href="{% url 'expense-create' %}" class="btn btn-added">
+            <img src="{% static 'assets/img/icons/plus.svg' %}" alt="Add Expense" class="me-1">
+            Add New Expense
+        </a>
+    </div>
+    {% endif %}
+</div>
+<div class="row">
+  <div class="col-lg-3 col-sm-6 col-12">
+    <div class="dash-widget dash1">
+      <div class="dash-widgetimg">
+        <span>
+          <img src="{% static 'assets/img/icons/dash2.svg' %}" alt="img">
+        </span>
+      </div>
+      <div class="dash-widgetcontent">
+        <h5> <span class="counters" data-count="{{ balance }}"></span>
+          ৳</h5>
+        <h6>Balance</h6>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-3 col-sm-6 col-12">
+    <div class="dash-widget">
+      <div class="dash-widgetimg">
+        <span>
+          <img src="{% static 'assets/img/icons/dash1.svg' %}" alt="img">
+        </span>
+      </div>
+      <div class="dash-widgetcontent">
+        <h5> <span class="counters" data-count=" {{ total_expense }} "></span>
+          ৳</h5>
+        <h6>Total Expense</h6>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3 col-sm-6 col-12">
+    <div class="dash-widget dash2">
+      <div class="dash-widgetimg">
+        <span>
+          <img src="{% static 'assets/img/icons/dash3.svg' %}" alt="img">
+        </span>
+      </div>
+      <div class="dash-widgetcontent">
+        <h5> <span class="counters" data-count="{{ today_expense }}"></span>
+          ৳</h5>
+        <h6>Today Expense</h6>
+      </div>
+    </div>
+  </div>
+
+  {% if not lone_hide %}
+  <div class="col-lg-3 col-sm-6 col-12">
+    <div class="dash-widget dash3">
+      <div class="dash-widgetimg">
+        <span>
+          <img src="{% static 'assets/img/icons/dash4.svg' %}" alt="img">
+        </span>
+      </div>
+      
+      <div class="dash-widgetcontent">
+        <h5> <span class="counters" data-count="{{ loan_balance }}"></span>
+          ৳</h5>
+        <h6>Loan</h6>
+      </div>
+     
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Filter Form -->
+{% if user_type == "ted" or user_type == "s2l" %}
+  <form method="get" action="{% url 'ted_s2l_expense_list' user_type=user_type %}">
+{% else %}
+  <form method="get" action="{% url 'expense-list' %}">
+{% endif %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-3 col-md-4">
+                    <label>Exact Date</label>
+                    <input type="date" name="date" class="form-control" value="{{ request.GET.date }}">
+                </div>
+                <div class="col-lg-3 col-md-4">
+                    <label>Category</label>
+                    <select name="category" class="form-control">
+                        <option value="">All</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat.id }}" {% if request.GET.category == cat.id|stringformat:"s" %}selected{% endif %}>
+                            {{ cat.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-lg-3 col-md-4">
+                    <label>Amount</label>
+                    <input type="number" step="0.01" name="amount" class="form-control" placeholder="Exact Amount" value="{{ request.GET.amount }}">
+                </div>
+                <div class="col-lg-12 mt-2">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+<!-- Expense Table -->
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table datanew">
+                <thead>
+                    <tr>
+                        <th><!-- Checkbox column --></th>
+                        <th>User</th>
+                        <th>Amount</th>
+      
+                        <th>Category</th>
+                        <th>Source</th>
+                        <th>Created At</th>
+                        {% if show_button %}
+                        <th>Action</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for expense in expenses %}
+                    <tr id="row-{{ expense.id }}">
+                        <td>
+                            <label class="checkboxs">
+                                <input type="checkbox">
+                                <span class="checkmarks"></span>
+                            </label>
+                        </td>
+                        <td>{{ expense.user.username }}</td>
+                        <td>{{ expense.ammount }}</td>
+
+                        <td>{% if expense.category %}{{ expense.category.name }}{% endif %}</td>
+                        <td>{{ expense.source }}</td>
+                        <td>
+                            {% localtime on %}
+                              {{ expense.created_at|date:"Y-m-d h:i A" }}
+                            {% endlocaltime %}
+                        </td>
+                        {% if show_button %}
+                        <td>
+                            <a class="me-3" href="{% url 'expense-update' expense.id %}">
+                                <img src="{% static 'assets/img/icons/edit.svg' %}" alt="Edit">
+                            </a>
+                            <a href="javascript:void(0);" class="delete-expense" data-id="{{ expense.id }}">
+                                <img src="{% static 'assets/img/icons/delete.svg' %}" alt="Delete">
+                            </a>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center">No expenses found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for AJAX Deletion -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  $(document).ready(function(){
+    $('.delete-expense').on('click', function(e) {
+      e.preventDefault();
+      var $btn = $(this);
+      var expenseId = $btn.data('id');
+      Swal.fire({
+        title: "Are you sure?",
+        text: "This action cannot be undone!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          $.ajax({
+            url: "{% url 'expense-delete' 0 %}".replace("0", expenseId),
+            type: "POST",
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+              if(response.success) {
+                Swal.fire({
+                  title: "Deleted!",
+                  text: "The expense has been deleted.",
+                  icon: "success",
+                  timer: 1500,
+                  showConfirmButton: false
+                }).then(() => {
+                  $("#row-" + expenseId).fadeOut("slow", function(){
+                    $(this).remove();
+                  });
+                });
+              } else {
+                Swal.fire("Error!", response.error, "error");
+              }
+            },
+            error: function() {
+              Swal.fire("Error!", "An error occurred while deleting the expense.", "error");
+            }
+          });
+        }
+      });
+    });
+  });
+</script>
+
+
+
+{% endblock %}
+
+
+
+

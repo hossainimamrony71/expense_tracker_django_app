@@ -1,0 +1,109 @@
+{% extends base_template %}
+{% load static %}
+{% block title %}Dashboard{% endblock %}
+{% load tz %}
+{% block content %}
+
+
+
+<div class="page-header">
+  <div class="page-title">
+      <h4>Allocated Money List</h4>
+      <h6>Manage Allocations</h6>
+  </div>
+</div>
+
+<!-- Allocation Form -->
+<div class="card mb-3">
+  <div class="card-body">
+      <form method="post" action="{% url 'allocated_money' %}">
+          {% csrf_token %}
+          <div class="row">
+              <!-- Recipient Dropdown -->
+              <div class="col-lg-6 col-md-6">
+                  <label for="id_allocated_to">Recipient</label>
+                  <select name="allocated_to" id="id_allocated_to" class="form-control">
+                      <option value="">Select Recipient</option>
+                      {% for user in form.fields.allocated_to.queryset %}
+                      <option value="{{ user.id }}" {% if form.data.allocated_to == user.id|stringformat:"s" %}selected{% endif %}>
+                          {{ user.username }}
+                      </option>
+                      {% endfor %}
+                  </select>
+              </div>
+
+              <!-- Amount Input -->
+              <div class="col-lg-6 col-md-6">
+                  <label for="id_amount">Amount</label>
+                  <input type="number" step="0.01" name="amount" id="id_amount" class="form-control" placeholder="Enter Amount"
+                      value="{{ form.data.amount|default_if_none:'' }}">
+              </div>
+
+              <!-- Source Input -->
+              <div class="col-lg-6 col-md-6">
+                  <label for="id_source">Source</label>
+                  <input type="input" name="source" id="id_source" class="form-control" placeholder="Enter Source"
+                      value="{{ form.data.source|default_if_none:'' }}">
+              </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="row mt-2">
+              <div class="col-lg-12">
+                  <button type="submit" class="btn btn-primary">Allocate Money</button>
+              </div>
+          </div>
+
+          <!-- Display non-field errors -->
+          {% if form.non_field_errors %}
+          <div class="alert alert-danger mt-2">
+              {{ form.non_field_errors }}
+          </div>
+          {% endif %}
+      </form>
+  </div>
+</div>
+
+<!-- Allocations List Table -->
+<div class="card">
+  <div class="card-body">
+      <div class="table-responsive">
+          <table class="table datanew">
+              <thead>
+                  <tr>
+                      <th>#</th>
+                      <th>Allocated By</th>
+                      <th>Allocated To</th>
+                      <th>Source</th>
+                      <th>Amount</th>
+                      <th>Date</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for allocation in allocations %}
+                  <tr>
+                      <td>{{ forloop.counter }}</td>
+                      <td>{{ allocation.allocated_by.username }}</td>
+                      <td>{{ allocation.allocated_to.username }}</td>
+                      <td>{{ allocation.source }}</td>
+                      <td>{{ allocation.amount }}</td>
+  
+                      <td>
+                        {% localtime on %}
+                          {{ allocation.created_at|date:"Y-m-d h:i A" }}
+                        {% endlocaltime %}
+                    </td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                      <td colspan="6" class="text-center">No allocations found.</td>
+                  </tr>
+                  {% endfor %}
+              </tbody>
+          </table>
+      </div>
+  </div>
+</div>
+
+
+{% endblock %}

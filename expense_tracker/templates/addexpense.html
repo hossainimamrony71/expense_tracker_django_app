@@ -1,0 +1,66 @@
+{% extends base_template %}
+{% load static %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+
+
+<div class="page-header">
+   <div class="page-title">
+      <h4>{% if is_update %}Expense Update{% else %}Expense Add{% endif %}</h4>
+      <h6>{% if is_update %}Update Existing Expense{% else %}Create New Expense{% endif %}</h6>
+   </div>
+</div>
+
+<div class="card">
+   <div class="card-body">
+      <form method="post" action="">
+          {% csrf_token %}
+          <div class="row">
+             <div class="col-lg-4 col-sm-6 col-12">
+                <div class="form-group">
+                   <label>Amount</label>
+                   <input type="text" name="ammount" class="form-control" placeholder="Enter amount"
+                          value="{{ form.ammount.value|default_if_none:'' }}">
+                   {% if form.ammount.errors %}
+                     <div class="text-danger">
+                        {% for error in form.ammount.errors %}
+                           <p>{{ error }}</p>
+                        {% endfor %}
+                     </div>
+                   {% endif %}
+                </div>
+             </div>
+
+             <div class="col-lg-4 col-sm-6 col-12">
+                <div class="form-group">
+                   <label>Category</label>
+                   <select name="category" class="form-control">
+                       <option value="">Select Category</option>
+                       {% for cat in categories %}
+                          <option value="{{ cat.id }}"
+                             {% if form.category.value|stringformat:"s" == cat.id|stringformat:"s" %}selected{% endif %}>
+                             {{ cat.name }}
+                          </option>
+                       {% endfor %}
+                   </select>
+                </div>
+             </div>
+             <div class="col-lg-4 col-sm-6 col-12">
+                <div class="form-group">
+                   <label>Source</label>
+                   <input type="text" name="source" class="form-control" value="{{ form.source.value|default:"cash" }}">
+                </div>
+             </div>
+             <div class="col-lg-12">
+                <button type="submit" class="btn btn-submit me-2">Submit</button>
+                <a href="{% url 'expense-list' %}" class="btn btn-cancel">Cancel</a>
+             </div>
+          </div>
+      </form>
+   </div>
+</div>
+
+
+ {% endblock %}

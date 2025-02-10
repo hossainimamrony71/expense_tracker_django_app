@@ -1,0 +1,53 @@
+{% extends base_template %}
+{% load static %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+
+
+
+
+
+<div class="page-header">
+  <div class="page-title">
+    <h4>{% if form.instance.pk %}Edit Product Category{% else %}Product Add Category{% endif %}</h4>
+    <h6>{% if form.instance.pk %}Update product category details{% else %}Create new product category{% endif %}</h6>
+  </div>
+</div>
+<div class="card">
+  <div class="card-body">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="row">
+        <!-- Category Name -->
+        <div class="col-lg-6 col-sm-6 col-12">
+          <div class="form-group">
+            <label for="{{ form.name.id_for_label }}">Category Name</label>
+            {{ form.name }}
+            {% for error in form.name.errors %}
+              <div class="invalid-feedback">{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+        <!-- Description -->
+        <div class="col-lg-12">
+          <div class="form-group">
+            <label for="{{ form.description.id_for_label }}">Description</label>
+            {{ form.description }}
+            {% for error in form.description.errors %}
+              <div class="invalid-feedback">{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+        <!-- Buttons -->
+        <div class="col-lg-12">
+          <button type="submit" class="btn btn-submit me-2">{% if form.instance.pk %}Update{% else %}Submit{% endif %}</button>
+          <a href="{% url 'category-list' %}" class="btn btn-cancel">Cancel</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

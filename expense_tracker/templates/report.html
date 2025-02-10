@@ -1,0 +1,103 @@
+{% extends base_template %}
+{% load static %}
+{% block title %}Generate Finance Report{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h4>Generate Finance Report</h4>
+        <h6>Create custom financial reports with ease</h6>
+    </div>
+</div>
+
+
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-gradient-primary text-white text-center py-4">
+            <h2 class="mb-0">
+                <i class="bi bi-file-earmark-spreadsheet me-2"></i>Generate Finance Report
+            </h2>
+        </div>
+        <div class="card-body px-5">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="row gy-4">
+                    <div class="col-md-6">
+                        <label for="user_type" class="form-label fw-semibold">User Type:</label>
+                        <select name="user_type" id="user_type" class="form-select">
+                            <option value="">All</option>
+                            {% for ut in user_types %}
+                                <option value="{{ ut }}">{{ ut|capfirst }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="model_choice" class="form-label fw-semibold">Select Model:</label>
+                        <select name="model_choice" id="model_choice" class="form-select" required>
+                            <option value="">Select Model</option>
+                            <option value="moneyallocation">Money Allocation</option>
+                            <option value="transaction">Transaction</option>
+                            <option value="loanrequest">Loan Request</option>
+                            <option value="expensecategory">Expense Category</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="date_range_option" class="form-label fw-semibold">Date Range:</label>
+                        <select name="date_range_option" id="date_range_option" class="form-select" required>
+                            <option value="today">Today</option>
+                            <option value="weekly">This Week</option>
+                            <option value="monthly">This Month</option>
+                            <option value="yearly">This Year</option>
+                            <option value="custom">Custom Range</option>
+                        </select>
+                    </div>
+
+                    <!-- Custom Date Range -->
+                    <div id="custom_date_range" class="col-md-6 d-none">
+                        <div class="row gx-2">
+                            <div class="col-md-6">
+                                <label for="custom_start_date" class="form-label fw-semibold">Start Date:</label>
+                                <input type="date" name="custom_start_date" id="custom_start_date" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="custom_end_date" class="form-label fw-semibold">End Date:</label>
+                                <input type="date" name="custom_end_date" id="custom_end_date" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 text-center mt-4">
+                        <button type="submit" class="btn btn-lg btn-success px-5">
+                            <i class="bi bi-file-earmark-arrow-down me-2"></i>Generate Excel Report
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Include Bootstrap JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    // Show/hide the custom date range inputs when the date_range_option changes.
+    $(document).ready(function() {
+        $('#date_range_option').on('change', function() {
+            var customRange = $('#custom_date_range');
+            if ($(this).val() === 'custom') {
+                customRange.removeClass('d-none');
+            } else {
+                customRange.addClass('d-none');
+            }
+        });
+    });
+</script>
+
+{% endblock %}
